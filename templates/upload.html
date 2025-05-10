@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flood Prediction</title>
+</head>
+<body style="margin: 0; font-family: Arial, sans-serif; background-color: #f0f4f8; color: #333;">
+
+    <!-- Header -->
+    <div style="background-color: #1e3a8a; padding: 20px; text-align: center; color: white;">
+        <h1 style="margin: 0;">Flood Prediction - Major Project</h1>
+        <p style="margin: 5px 0 0;">By Rohan</p>
+    </div>
+
+    <!-- Main Content -->
+    <div style="max-width: 600px; margin: 40px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <h2 style="text-align: center; color: #1e3a8a;">Upload Rainfall Data</h2>
+        <p style="font-size: 14px; color: #555;">Please upload a CSV file containing rainfall data for the past 90 days, including the following columns: <code>LATITUDE</code>, <code>LONGITUDE</code>, <code>TIME</code>, <code>RAINFALL</code>.</p>
+        
+        <form action="/" method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+            <input type="file" name="file" accept=".csv" required style="padding: 8px; border: 1px solid #ccc; border-radius: 5px;">
+            <button type="submit" style="padding: 10px; background-color: #2563eb; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
+                Predict Flood Risk
+            </button>
+        </form>
+    </div>
+
+</body>
+</html>

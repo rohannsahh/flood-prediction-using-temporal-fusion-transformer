@@ -1,0 +1,6 @@
+/.venv
+rainfall_with_correct_flood_labels.csv
+training.pkl
+tft_model_1.ckpt
+tft_model.ckpt
+major_project2.zip

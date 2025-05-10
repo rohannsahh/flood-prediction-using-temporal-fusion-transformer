@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body style="margin: 0; font-family: Arial, sans-serif; background-color: #f0f4f8; color: #333;">
+
+    <!-- Loader -->
+    <div id="loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+         background-color: white; display: flex; justify-content: center; align-items: center; z-index: 9999;">
+        <div style="border: 6px solid #ccc; border-top: 6px solid #2563eb; border-radius: 50%;
+            width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+    </div>
+    <script>
+        setTimeout(() => document.getElementById('loader').style.display = 'none', 1500);
+    </script> 
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg);}
+            100% { transform: rotate(360deg);}
+        }
+    </style>
+
+    <!-- Header -->
+    <div style="background-color: #1e3a8a; padding: 20px; text-align: center; color: white;">
+        <h1 style="margin: 0;">Flood Prediction - Major Project</h1>
+        <p style="margin: 5px 0 0;">By Rohan</p>
+    </div>
+
+    <!-- Results Container -->
+    <div style="max-width: 900px; margin: 40px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <h2 style="text-align: center; color: #1e3a8a;">Flood Risk Prediction Results</h2>
+
+        <!-- Chart -->
+        <canvas id="floodChart" style="margin: 20px 0;"></canvas>
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <thead>
+                <tr style="background-color: #2563eb; color: white;">
+                    <th style="padding: 10px; border: 1px solid #ccc;">Day</th>
+                    <th style="padding: 10px; border: 1px solid #ccc;">Rainfall (mm)</th>
+                    <th style="padding: 10px; border: 1px solid #ccc;">Flood Probability (0-1)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for day, prob, rainfall in prediction %}
+                    <tr style="background-color: {% if loop.index0 % 2 == 0 %}#f9f9f9{% else %}#ffffff{% endif %};">
+                        <td style="padding: 10px; border: 1px solid #ccc; text-align: center;">{{ day }}</td>
+                        <td style="padding: 10px; border: 1px solid #ccc; text-align: center;">{{ prob | round(4) }}</td>
+                        <td style="padding: 10px; border: 1px solid #ccc; text-align: center;">{{ rainfall | round(2) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Export Buttons -->
+        <div style="text-align: center; margin-top: 30px;">
+            <button onclick="exportToCSV()" style="margin-right: 10px; padding: 10px 15px; background-color: #2563eb; color: white; border: none; border-radius: 5px;">Download CSV</button>
+            <button onclick="window.print()" style="margin-right: 10px; padding: 10px 15px; background-color: #10b981; color: white; border: none; border-radius: 5px;">Save as PDF</button>
+            <a href="/" style="display: inline-block; padding: 10px 20px; background-color: #d97706; color: white; text-decoration: none; border-radius: 5px;">Upload Another File</a>
+        </div>
+    </div>
+
+    <!-- JS for Chart and CSV -->
+    <script>
+        const floodData = {{ prediction|tojson }};
+        const labels = floodData.map(item => `Day ${item[0]}`);
+        const floodProbData = floodData.map(item => item[1]);
+        const rainfallData = floodData.map(item => item[2]);
+
+        const ctx = document.getElementById('floodChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: 'Flood Probability',
+                        data: floodProbData,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        pointBackgroundColor: floodProbData.map(p => p >= 0.5 ? 'red' : '#2563eb'),
+                        pointRadius: 4,
+                        tension: 0.3,
+                    },
+                    {
+                        label: 'Rainfall (mm)',
+                        data: rainfallData,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        pointBackgroundColor: rainfallData.map(r => r > 0 ? 'blue' : '#10b981'),
+                        pointRadius: 4,
+                        tension: 0.3,
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                }
+            }
+        });
+
+        function exportToCSV() {
+            let csv = "Day,Flood Probability,Rainfall\n";
+            floodData.forEach(([day, prob, rainfall]) => {
+                csv += `${day},${prob},${rainfall}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'flood_prediction_with_rainfall.csv';
+            link.click();
+        }
+    </script>
+
+</body>
+</html>
